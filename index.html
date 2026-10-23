@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sesión 17: Posicionamiento CSS y Flujo de Documento — IDAT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            idatYellow: '#FFC820',
+            idatDark: '#111827',
+            idatMuted: '#4B5563',
+            idatLight: '#F3F4F6'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .slide-container {
+      perspective: 1000px;
+    }
+    .slide {
+      transition: all 0.4s ease-in-out;
+      opacity: 0;
+      transform: scale(0.99) translateY(4px);
+      display: none;
+    }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1f2937;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #4b5563;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #FFC820;
+    }
+
+    /* Animaciones suaves para las cajas de prueba */
+    .demo-box-transition {
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-idatDark font-sans h-screen flex flex-col justify-between overflow-hidden select-none">
+
+  <!-- Header Corporativo Superior (Altura Fija) -->
+  <header class="bg-idatDark text-white px-6 md:px-12 py-3 flex items-center justify-between border-b-4 border-idatYellow shadow-md h-[72px] flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="bg-idatYellow text-idatDark font-black px-3 py-1 rounded text-lg tracking-wider">IDAT</div>
+      <div class="h-6 w-[1px] bg-gray-600 hidden md:block"></div>
+      <div class="hidden md:block">
+        <span class="text-xs text-idatYellow font-bold tracking-widest block uppercase">Desarrollo Web: HTML & CSS</span>
+        <span class="text-sm font-semibold">Sesión 17: Box-Sizing y Posicionamiento CSS (Static, Relative, Absolute, Fixed, Sticky & Z-Index)</span>
+      </div>
+    </div>
+    <div class="text-right text-xs md:text-sm font-medium text-gray-300">
+      Docente: <strong class="text-idatYellow">Ing. Jhon Chavez</strong>
+    </div>
+  </header>
+
+  <!-- Área Principal de Diapositivas -->
+  <main class="flex-1 p-4 md:p-6 overflow-hidden flex items-center justify-center">
+    <div class="w-full max-w-6xl h-full flex items-stretch justify-center slide-container">
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 1: Portada (Sesión 17) -->
+      <!-- ============================================== -->
+      <div id="slide-1" class="slide active w-full bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden flex-col md:flex-row h-full">
+        <!-- Panel Izquierdo Amarillo -->
+        <div class="md:w-5/12 bg-idatYellow p-8 md:p-12 flex flex-col justify-between relative overflow-hidden h-full flex-shrink-0">
+          <div class="absolute -right-16 -top-16 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
+          <div>
+            <span class="bg-idatDark text-idatYellow font-black px-4 py-1.5 rounded-full text-xs tracking-widest uppercase">SESIÓN 17</span>
+            <h1 class="text-3xl md:text-5xl font-black text-idatDark mt-6 leading-tight">Box-Sizing, Flujo & Posición CSS</h1>
+            <p class="text-idatDark/80 font-medium mt-3 text-sm md:text-base">Domina el cálculo físico exacto de tus cajas con <code>box-sizing</code> y comprende <code>position</code> sin enredos: analogías visuales, anclajes y simuladores en vivo.</p>
+          </div>
+          <div class="border-t border-idatDark/20 pt-6">
+            <span class="text-xs font-bold uppercase tracking-wider text-idatDark/60 block">Facilitador del curso:</span>
+            <span class="text-xl font-extrabold text-idatDark block mt-1">Ing. Jhon Chavez</span>
+            <span class="text-xs font-semibold bg-idatDark/10 text-idatDark px-2 py-0.5 rounded mt-2 inline-block">IDAT © 2026</span>
+          </div>
+        </div>
+        <!-- Panel Derecho de Información -->
+        <div class="md:w-7/12 p-8 md:p-12 flex flex-col justify-center bg-radial-at-tr from-gray-50 to-white h-full overflow-y-auto">
+          <h2 class="text-2xl md:text-3xl font-bold text-idatDark mb-3">El secreto para que tus layouts nunca se desarmen</h2>
+          <p class="text-gray-600 mb-6 leading-relaxed text-xs md:text-sm">En CSS hay dos grandes razones por las que un diseño se rompe: calcular mal el ancho de una caja sumándole rellenos y bordes, o mover elementos sin saber si siguen en la fila natural o flotan en el aire. Hoy dominarás ambos conceptos con ejemplos interactivos paso a paso.</p>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="bg-idatLight p-4 rounded-2xl border border-gray-200 flex flex-col justify-between">
+              <span class="text-2xl mb-1 block">📐</span>
+              <h3 class="font-bold text-xs md:text-sm text-idatDark">Box-Sizing</h3>
+              <p class="text-[11px] text-idatMuted mt-1">La matemática real: <code>content-box</code> vs <code>border-box</code>.</p>
+            </div>
+            <div class="bg-idatLight p-4 rounded-2xl border border-gray-200 flex flex-col justify-between">
+              <span class="text-2xl mb-1 block">🚶‍♂️</span>
+              <h3 class="font-bold text-xs md:text-sm text-idatDark">Static & Relative</h3>
+              <p class="text-[11px] text-idatMuted mt-1">El orden natural y el "desplazamiento fantasma".</p>
+            </div>
+            <div class="bg-idatLight p-4 rounded-2xl border border-gray-200 flex flex-col justify-between">
+              <span class="text-2xl mb-1 block">⚓</span>
+              <h3 class="font-bold text-xs md:text-sm text-idatDark">Absolute & Capas</h3>
+              <p class="text-[11px] text-idatMuted mt-1">La fórmula indestructible: Padre Relativo + Hijo Absoluto.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 2: Agenda de la Sesión -->
+      <!-- ============================================== -->
+      <div id="slide-2" class="slide w-full bg-white rounded-3xl shadow-xl border border-gray-200 p-8 md:p-12 flex-col justify-between h-full">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="bg-idatYellow text-idatDark font-bold px-2.5 py-0.5 rounded text-xs">RUTA PEDAGÓGICA</span>
+              <h2 class="text-2xl font-black text-idatDark uppercase tracking-tight">Agenda de la Sesión 17</h2>
+            </div>
+            <p class="text-sm text-idatMuted mb-6">4 pilares estratégicos explicados con claridad absoluta para dominar dimensiones físicas y la tercera dimensión en CSS.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Punto 1: Box-sizing al inicio -->
+              <div class="flex gap-4 p-5 rounded-2xl bg-idatLight border-l-4 border-amber-500 items-start">
+                <span class="font-extrabold text-amber-500 text-2xl leading-none">01</span>
+                <div>
+                  <h3 class="font-bold text-sm md:text-base text-idatDark">Box-Sizing: El Cálculo Físico de tus Cajas</h3>
+                  <p class="text-xs text-idatMuted mt-1">Por qué <code>content-box</code> engorda tus elementos rompiendo el ancho real y cómo <code>border-box</code> soluciona las medidas para siempre.</p>
+                </div>
+              </div>
+              <!-- Punto 2: Fusión Static + Relative -->
+              <div class="flex gap-4 p-5 rounded-2xl bg-idatLight border-l-4 border-idatYellow items-start">
+                <span class="font-extrabold text-idatYellow text-2xl leading-none">02</span>
+                <div>
+                  <h3 class="font-bold text-sm md:text-base text-idatDark">Fusión: Static & Relative (El Flujo Natural)</h3>
+                  <p class="text-xs text-idatMuted mt-1">Por qué <code>static</code> ignora <code>top/left</code>, cómo <code>relative</code> se mueve sin empujar a sus vecinos y su rol crucial como ancla.</p>
+                </div>
+              </div>
+              <!-- Punto 3: Absolute -->
+              <div class="flex gap-4 p-5 rounded-2xl bg-idatLight border-l-4 border-idatDark items-start">
+                <span class="font-extrabold text-idatDark text-2xl leading-none">03</span>
+                <div>
+                  <h3 class="font-bold text-sm md:text-base text-idatDark">Position Absolute: El Astronauta de la Web</h3>
+                  <p class="text-xs text-idatMuted mt-1">El elemento despega del suelo, flota libremente y se posiciona respecto al ancestro que tenga <code>position: relative</code>.</p>
+                </div>
+              </div>
+              <!-- Punto 4: Fixed, Sticky y z-index -->
+              <div class="flex gap-4 p-5 rounded-2xl bg-idatLight border-l-4 border-blue-500 items-start">
+                <span class="font-extrabold text-blue-500 text-2xl leading-none">04</span>
+                <div>
+                  <h3 class="font-bold text-sm md:text-base text-idatDark">Fixed, Sticky, z-index y Taller Práctico</h3>
+                  <p class="text-xs text-idatMuted mt-1">Botones congelados, cabeceras inteligentes, capas superpuestas y laboratorio de una tarjeta de producto con badge.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-idatMuted flex-shrink-0">
+            <span>Bloque 2 · Dimensiones Métricas y Posicionamiento CSS</span>
+            <span class="font-semibold text-idatDark">IDAT - Desarrollo Web 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 3: Box-Sizing - La Matemática del Tamaño -->
+      <!-- ============================================== -->
+      <div id="slide-3" class="slide w-full bg-white rounded-3xl shadow-xl border border-gray-200 p-8 md:p-12 flex-col justify-between h-full">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="bg-idatYellow text-idatDark font-bold px-2.5 py-0.5 rounded text-xs">TEMA 1</span>
+                <h2 class="text-2xl font-black text-idatDark uppercase tracking-tight">Box-Sizing: ¿Cuánto mide realmente tu caja?</h2>
+              </div>
+              <span class="text-xs text-idatMuted font-bold uppercase">content-box vs border-box</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch mt-2">
+              <div class="md:col-span-6 flex flex-col justify-between pr-2 text-xs md:text-sm">
+                <p class="text-gray-600 leading-relaxed mb-3">
+                  En CSS, si defines <code>width: 200px</code>, ¿el elemento medirá 200px en pantalla? <strong>¡Por defecto NO!</strong> La propiedad <code>box-sizing</code> define cómo se calcula el tamaño físico:
+                </p>
+
+                <!-- Comparativa Visual de Fórmulas -->
+                <div class="space-y-2 text-xs">
+                  <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded-xl">
+                    <strong class="text-red-900 font-bold block mb-1">1. content-box (El comportamiento por defecto del navegador)</strong>
+                    <p class="text-gray-600 text-[11px] leading-relaxed mb-1.5">
+                      El ancho declarado es <strong>solo para el contenido</strong>. Si añades <code>padding: 20px</code> y <code>border: 5px</code>, el navegador se los <em>suma hacia afuera</em>.
+                    </p>
+                    <code class="block font-mono text-[10px] text-red-800 bg-white p-1 rounded border border-red-200">
+                      Ancho Real = width (200) + padding (20+20) + border (5+5) = 250px ❌ ¡Engorda!
+                    </code>
+                  </div>
+
+                  <div class="p-3 bg-emerald-50 border-l-4 border-emerald-500 rounded-xl">
+                    <strong class="text-emerald-950 font-bold block mb-1">2. border-box (El estándar moderno de la industria)</strong>
+                    <p class="text-gray-600 text-[11px] leading-relaxed mb-1.5">
+                      El ancho declarado es el <strong>tamaño total definitivo</strong>. El relleno y el borde se absorben <em>hacia adentro</em>.
+                    </p>
+                    <code class="block font-mono text-[10px] text-emerald-800 bg-white p-1 rounded border border-emerald-200">
+                      Ancho Real = EXACTAMENTE width (200px) ✔️ ¡Predecible y perfecto!
+                    </code>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Código y Regla Universal -->
+              <div class="md:col-span-6 bg-idatDark text-gray-100 rounded-2xl p-5 font-mono text-xs overflow-auto custom-scrollbar shadow-inner relative flex flex-col justify-center min-h-[250px]">
+                <div class="absolute right-3 top-3 text-[10px] text-gray-400 bg-gray-800 px-2 py-0.5 rounded font-sans uppercase">La Regla de Oro que Salva Vidas</div>
+                
+                <div class="space-y-2 text-xs mb-3">
+                  <div class="text-gray-400">/* El Reset que todo proyecto debe tener al inicio */</div>
+                  <div><span class="text-yellow-400 font-bold">*, *::before, *::after</span> {</div>
+                  <div class="pl-6 text-green-400 font-bold">box-sizing: border-box; <span class="text-gray-500">/* ¡Garantiza medidas exactas! */</span></div>
+                  <div class="pl-6 text-green-400">margin: 0;</div>
+                  <div class="pl-6 text-green-400">padding: 0;</div>
+                  <div>}</div>
+                </div>
+
+                <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 text-[11px] font-sans text-gray-300">
+                  <strong class="text-idatYellow block mb-0.5">💡 ¿Por qué es vital antes de ver position?</strong>
+                  Porque si tus contenedores padres cambian de tamaño accidentalmente por culpa del padding, las coordenadas <code>top</code>, <code>right</code> y <code>left</code> de los elementos posicionados aterrizarán en lugares inesperados.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs text-idatMuted border-t border-gray-100 pt-2 flex justify-between flex-shrink-0">
+            <span>W3C CSS Box Sizing Module Level 3</span>
+            <span>Estándar Universal de Maquetación</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 4: Demostración Interactiva de Box-Sizing -->
+      <!-- ============================================== -->
+      <div id="slide-4" class="slide w-full bg-white rounded-3xl shadow-xl border border-gray-200 p-8 md:p-12 flex-col justify-between h-full">
+        <div class="flex flex-col h-full justify-between">
+          <div class="flex items-center justify-between mb-3 flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="bg-idatYellow text-idatDark font-bold px-2.5 py-0.5 rounded text-xs">DEMO EN VIVO 1</span>
+              <h2 class="text-xl font-black text-idatDark uppercase tracking-tight">Simulador: Mira cómo `content-box` desborda el layout</h2>
+            </div>
+            <button onclick="toggleExample('example-box-sizing')" class="text-xs bg-idatDark text-white px-4 py-1.5 rounded-full font-bold hover:bg-idatYellow hover:text-idatDark transition-colors">
+              💻 Ver Código / Vista Previa
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch flex-1 min-h-0 my-2">
+            <!-- Controles Interactivos -->
+            <div class="text-sm flex flex-col justify-between">
+              <div>
+                <p class="text-idatMuted leading-relaxed mb-3 text-xs md:text-sm">
+                  Ambas cajas tienen declarado <code>width: 220px</code>, <code>padding: 24px</code> y <code>border: 6px</code>. Mira cómo reacciona cada una dentro de su espacio asignado:
+                </p>
+                <div class="space-y-3 bg-idatLight p-4 rounded-2xl border border-gray-200 text-xs">
+                  <div>
+                    <label class="block font-bold text-idatDark mb-2">Comportamiento en vivo:</label>
+                    <div class="flex flex-wrap gap-2">
+                      <button onclick="applyBoxSizingDemo('content-box')" class="px-3 py-2 font-bold rounded-xl bg-red-100 hover:bg-red-200 text-red-900 border border-red-300 transition-colors">
+                        1. Ver con content-box (Se desborda)
+                      </button>
+                      <button onclick="applyBoxSizingDemo('border-box')" class="px-3 py-2 font-bold rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 transition-colors">
+                        2. Ver con border-box (Encaje exacto)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div id="demo-box-sizing-explanation" class="p-3 bg-white rounded-xl border border-gray-200 text-[11px] text-gray-700 leading-relaxed">
+                    👉 <strong>Estado actual:</strong> <code>box-sizing: border-box</code>. El ancho total real es exactamente <strong>220px</strong>. El padding y el borde viven dentro de la caja.
+                  </div>
+                </div>
+              </div>
+              <span class="text-[11px] text-gray-400">💡 La línea roja punteada representa el límite máximo de 220px que le permitía el diseño.</span>
+            </div>
+
+            <!-- Panel de Resultados de Box-Sizing -->
+            <div class="border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col bg-white h-full min-h-[300px] md:h-auto">
+              <div class="bg-gray-100 px-4 py-2 flex justify-between items-center border-b border-gray-200">
+                <span id="label-box-sizing" class="text-xs font-bold text-idatDark">Vista Previa Física de la Caja</span>
+                <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+              </div>
+              
+              <div class="p-6 flex-1 overflow-auto custom-scrollbar flex items-center justify-center bg-gray-50/50">
+                <!-- VISTA PREVIA -->
+                <div id="preview-box-sizing" class="w-full flex flex-col items-center justify-center">
+                  <div class="relative w-[280px] h-48 flex items-center justify-center bg-white border-2 border-dashed border-gray-300 rounded-2xl p-4">
+                    <!-- Guía de límite máximo de 220px -->
+                    <div class="absolute w-[220px] h-36 border-2 border-dashed border-red-400 rounded-xl pointer-events-none flex items-start justify-end p-1">
+                      <span class="text-[9px] bg-red-100 text-red-700 font-bold px-1 rounded">Límite: 220px</span>
+                    </div>
+
+                    <!-- Caja de prueba interactiva -->
+                    <div id="interactive-box-sizing-box" class="demo-box-transition bg-amber-100 border-4 border-amber-500 rounded-xl flex flex-col items-center justify-center text-center shadow-md relative" style="width: 220px; padding: 24px; box-sizing: border-box;">
+                      <span id="box-sizing-tag" class="text-[10px] bg-idatDark text-idatYellow font-mono px-2 py-0.5 rounded font-bold">border-box</span>
+                      <span id="box-sizing-dimensions" class="text-xs font-black text-amber-950 mt-1">Ancho Real: 220px</span>
+                      <span class="text-[10px] text-amber-800 mt-0.5">Padding: 24px | Border: 4px</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CÓDIGO HTML/CSS -->
+                <div id="code-box-sizing" class="hidden w-full h-full font-mono text-xs text-yellow-400 bg-idatDark p-4 rounded-xl overflow-auto custom-scrollbar">
+                  <pre><span class="text-gray-400">/* Comparativa de Box-Sizing */</span>
+
+<span class="text-blue-400">.caja-desbordada</span> {
+  <span class="text-green-400">box-sizing: content-box;</span>  <span class="text-gray-400">/* Por defecto */</span>
+  <span class="text-green-400">width: 220px;</span>
+  <span class="text-green-400">padding: 24px;</span>
+  <span class="text-green-400">border: 4px solid #F59E0B;</span>
+  <span class="text-red-400">/* Ancho físico real = 220 + 48 + 8 = 276px (¡Se rompe!) */</span>
+}
+
+<span class="text-blue-400">.caja-perfecta</span> {
+  <span class="text-green-400 font-bold">box-sizing: border-box;</span>   <span class="text-gray-400">/* Recomendado */</span>
+  <span class="text-green-400">width: 220px;</span>
+  <span class="text-green-400">padding: 24px;</span>
+  <span class="text-green-400">border: 4px solid #F59E0B;</span>
+  <span class="text-emerald-400">/* Ancho físico real = EXACTAMENTE 220px (¡Respeta el límite!) */</span>
+}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 5: Fusión Static + Relative -->
+      <!-- ============================================== -->
+      <div id="slide-5" class="slide w-full bg-white rounded-3xl shadow-xl border border-gray-200 p-8 md:p-12 flex-col justify-between h-full">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="bg-idatYellow text-idatDark font-bold px-2.5 py-0.5 rounded text-xs">TEMA 2</span>
+                <h2 class="text-2xl font-black text-idatDark uppercase tracking-tight">Fusión: Static vs. Relative</h2>
+              </div>
+              <span class="text-xs text-idatMuted font-bold uppercase">Entendiendo el "Flujo Natural"</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch mt-2">
+              <div class="md:col-span-6 flex flex-col justify-between pr-2 text-xs md:text-sm">
+                <p class="text-gray-600 leading-relaxed mb-3">
+                  Para entender el posicionamiento, imagina una <strong>fila en el banco</strong>. Todo el mundo respeta su turno uno detrás de otro:
+                </p>
+
+                <!-- Comparativa lado a lado con analogías claras -->
+                <div class="space-y-2 text-xs">
+                  <div class="p-3 bg-gray-50 border-l-4 border-gray-400 rounded-xl">
+                    <strong class="text-gray-900 font-bold block mb-1">1. position: static (El valor por defecto de TODO en la web)</strong>
+                    <p class="text-gray-600 text-[11px] leading-relaxed">
+                      El elemento está en su lugar natural de la fila. Si intentas ponerle <code>top: 20px</code> o <code>left: 50px</code>, <strong>CSS lo ignorará por completo</strong>. Está pegado al suelo.
+                    </p>
+                  </div>
+
+                  <div class="p-3 bg-amber-50 border-l-4 border-idatYellow rounded-xl">
+                    <strong class="text-idatDark font-bold block mb-1">2. position: relative (El "desfase fantasma")</strong>
+                    <p class="text-gray-600 text-[11px] leading-relaxed mb-1">
+                      El elemento sigue guardando su lugar en la fila (sus vecinos no se mueven ni se enteran), pero se mueve visualmente <strong>respecto a donde debió haber nacido</strong> usando <code>top</code>, <code>bottom</code>, <code>left</code> o <code>right</code>.
+                    </p>
+                    <div class="bg-white p-1.5 rounded border border-amber-200 text-amber-900 text-[10px] font-bold">
+                      ⭐ Su superpoder secreto: Sirve como "ancla" para atrapar a los elementos <code>absolute</code>.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Código y Tarjeta Resumen -->
+              <div class="md:col-span-6 bg-idatDark text-gray-100 rounded-2xl p-5 font-mono text-xs overflow-auto custom-scrollbar shadow-inner relative flex flex-col justify-center min-h-[250px]">
+                <div class="absolute right-3 top-3 text-[10px] text-gray-400 bg-gray-800 px-2 py-0.5 rounded font-sans uppercase">Sintaxis en CSS</div>
+                
+                <div class="space-y-2 text-xs mb-3">
+                  <div class="text-gray-400">/* Comportamiento Relative */</div>
+                  <div><span class="text-yellow-400 font-bold">.caja-desplazada</span> {</div>
+                  <div class="pl-6 text-green-400">position: relative;</div>
+                  <div class="pl-6 text-blue-400">top: 15px; <span class="text-gray-500">/* Baja 15px de su sitio original */</span></div>
+                  <div class="pl-6 text-blue-400">left: 20px; <span class="text-gray-500">/* Se empuja 20px a la derecha */</span></div>
+                  <div>}</div>
+                </div>
+
+                <div class="bg-gray-800/80 p-3 rounded-xl border border-gray-700 text-[11px] font-sans text-gray-300">
+                  <strong class="text-idatYellow block mb-0.5">💡 La regla de oro que debes recordar:</strong>
+                  <code>relative</code> nunca desacomoda a las cajas vecinas. Deja un "hueco invisible" en su posición original como si aún estuviera ahí.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs text-idatMuted border-t border-gray-100 pt-2 flex justify-between flex-shrink-0">
+            <span>Propiedades activas solo con position: top, right, bottom, left y z-index.</span>
+            <span>W3C CSS Position Level 3</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 6: Ejemplo Interactivo Static vs Relative -->
+      <!-- ============================================== -->
+      <div id="slide-6" class="slide w-full bg-white rounded-3xl shadow-xl border border-gray-200 p-8 md:p-12 flex-col justify-between h-full">
+        <div class="flex flex-col h-full justify-between">
+          <div class="flex items-center justify-between mb-3 flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="bg-idatYellow text-idatDark font-bold px-2.5 py-0.5 rounded text-xs">DEMO EN VIVO 2</span>
+              <h2 class="text-xl font-black text-idatDark uppercase tracking-tight">Experimento en Vivo: ¿Qué hace `relative`?</h2>
+            </div>
+            <button onclick="toggleExample('example-pos-rel')" class="text-xs bg-idatDark text-white px-4 py-1.5 rounded-full font-bold hover:bg-idatYellow hover:text-idatDark transition-colors">
+              💻 Ver Código / Vista Previa
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch flex-1 min-h-0 my-2">
+            <!-- Controles de la Demostración -->
+            <div class="text-sm flex flex-col justify-between">
+              <div>
+                <p class="text-idatMuted leading-relaxed mb-3 text-xs md:text-sm">
+                  Mira las tres cajas en fila. Presiona los botones y observa con atención qué le pasa a la <strong>Caja 2 (Amarilla)</strong> y qué le pasa a la <strong>Caja 3 (Gris)</strong>:
+                </p>
+                
+                <div class="space-y-3 bg-idatLight p-4 rounded-2xl border border-gray-200 text-xs">
+                  <div>
+                    <label class="block font-bold text-idatDark mb-2">Cambia la posición de la Caja 2:</label>
+                    <div class="flex flex-wrap gap-2">
+                      <button onclick="applyRelativeDemo('static')" class="px-3 py-2 font-bold rounded-xl bg-gray-200 hover:bg-gray-300 text-idatDark transition-colors">
+                        1. Static (Normal)
+                      </button>
+                      <button onclick="applyRelativeDemo('relative-moved')" class="px-3 py-2 font-bold rounded-xl bg-idatYellow hover:bg-yellow-400 text-idatDark shadow-sm transition-colors">
+                        2. Relative (top: 25px; left: 30px)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div id="demo-rel-explanation" class="p-3 bg-white rounded-xl border border-gray-200 text-[11px] text-gray-700 leading-relaxed">
+                    👉 <strong>Estado actual:</strong> <code>position: static</code>. Las tres cajas descansan una al lado de la otra en su flujo natural.
+                  </div>
+                </div>
+              </div>
+              <span class="text-[11px] text-gray-400">💡 Fíjate cómo la Caja 3 jamás se mueve, aunque la Caja 2 se desplace.</span>
+            </div>
+
+            <!-- Panel de Resultados Visuales -->
+            <div class="border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col bg-white h-full min-h-[300px] md:h-auto">
+              <div class="bg-gray-100 px-4 py-2 flex justify-between items-center border-b border-gray-200">
+                <span id="label-pos-rel" class="text-xs font-bold text-idatDark">Vista Previa del Escenario</span>
+                <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+              </div>
+              
+              <div class="p-6 flex-1 overflow-auto custom-scrollbar flex items-center justify-center bg-gray-50/50">
+                <!-- VISTA PREVIA -->
+                <div id="preview-pos-rel" class="w-full flex justify-center items-center">
+                  <div class="relative bg-white border-2 border-dashed border-gray-300 rounded-2xl p-6 w-full max-w-md h-52 flex items-center justify-around">
+                    <!-- Caja 1 -->
+                    <div class="w-24 h-24 bg-idatDark text-white rounded-xl flex flex-col items-center justify-center text-xs font-bold shadow-md">
+                      <span>Caja 1</span>
+                      <span class="text-[9px] text-gray-400 font-mono">static</span>
+                    </div>
+
+                    <!-- Caja 2 (Interactiva) -->
+                    <div id="interactive-box-2" class="demo-box-transition w-24 h-24 bg-idatYellow text-idatDark rounded-xl flex flex-col items-center justify-center text-xs font-black shadow-lg border-2 border-idatDark relative">
+                      <span>Caja 2</span>
+                      <span id="box-2-tag" class="text-[9px] bg-idatDark text-idatYellow px-1.5 py-0.5 rounded font-mono mt-1">static</span>
+                    </div>
+
+                    <!-- Caja 3 -->
+                    <div class="w-24 h-24 bg-gray-300 text-gray-700 rounded-xl flex flex-col items-center justify-center text-xs font-bold border border-gray-400">
+                      <span>Caja 3</span>
+                      <span class="text-[9px] text-gray-500 font-mono">static</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CÓDIGO HTML/CSS -->
+                <div id="code-pos-rel" class="hidden w-full h-full font-mono text-xs text-yellow-400 bg-idatDark p-4 rounded-xl overflow-auto custom-scrollbar">
+                  <pre><span class="text-gray-400">/* La magia de position: relative */</span>
+<span class="text-blue-400">.caja-2</span> {
+  <span class="text-green-400">position: relative;</span>
+  <span class="text-green-400">top: 25px;</span>    <span class="text-gray-400">/* Se empuja hacia abajo */</span>
+  <span class="text-green-400">left: 30px;</span>   <span class="text-gray-400">/* Se empuja hacia la derecha */</span>
+}
+
+<span class="text-gray-400">/* Observa la Caja 3: */</span>
+<span class="text-blue-400">.caja-3</span> {
+  <span class="text-gray-400">/* ¡NO se mueve! Respeta el espacio */</span>
+  <span class="text-gray-400">/* original que dejó la Caja 2. */</span>
+}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 7: Position Absolute y el Ancla -->
+      <!-- ============================================== -->
+      <div id="slide-7" class="slide w-full bg-white rounded-3xl shadow-xl border border-gray-200 p-8 md:p-12 flex-col justify-between h-full">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="bg-idatYellow text-idatDark font-bold px-2.5 py-0.5 rounded text-xs">TEMA 3</span>
+                <h2 class="text-2xl font-black text-idatDark uppercase tracking-tight">Position Absolute: El Astronauta de la Web</h2>
+              </div>
+              <span class="text-xs text-idatMuted font-bold uppercase">La Pareja Inseparable: Relative + Absolute</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch mt-2">
+              <div class="md:col-span-6 flex flex-col justify-between pr-2 text-xs md:text-sm">
+                <p class="text-gray-600 leading-relaxed mb-3">
+                  Cuando a un elemento le pones <code>position: absolute</code>, ocurre algo radical: <strong>pierde la gravedad</strong>, despega de la fila y los demás elementos se cierran ocupando su lugar como si nunca hubiera existido.
+                </p>
+
+                <div class="space-y-2 text-xs">
+                  <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded-xl text-red-900">
+                    <strong class="font-bold block mb-0.5">⚠️ El gran error que todos cometen:</strong>
+                    Si declaras <code>position: absolute; top: 0; right: 0;</code> sin preparar a su padre, ¡el elemento volará hasta la esquina superior derecha de <strong>toda la ventana del navegador</strong>!
+                  </div>
+
+                  <div class="p-3 bg-emerald-50 border-l-4 border-emerald-500 rounded-xl text-emerald-950">
+                    <strong class="font-bold block mb-0.5">⚓ La solución: El contenedor "Ancla" (Relative)</strong>
+                    Para que el elemento absoluto flote <em>dentro</em> de una tarjeta, debes ponerle <code>position: relative</code> al contenedor padre. El padre se convierte en su jaula de contención.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sintaxis y Fórmula Visual -->
+              <div class="md:col-span-6 bg-idatDark text-gray-100 rounded-2xl p-5 font-mono text-xs overflow-auto custom-scrollbar shadow-inner relative flex flex-col justify-center min-h-[250px]">
+                <div class="absolute right-3 top-3 text-[10px] text-gray-400 bg-gray-800 px-2 py-0.5 rounded font-sans uppercase">El Combo que Usarás el 99% de Veces</div>
+                
+                <div class="space-y-2 text-xs">
+                  <div class="text-gray-400">/* 1. El Contenedor Padre (La Isla) */</div>
+                  <div><span class="text-yellow-400 font-bold">.tarjeta-padre</span> {</div>
+                  <div class="pl-6 text-green-400 font-bold">position: relative; <span class="text-gray-500">/* &lt;-- ¡ESTA ES LA CLAVE! */</span></div>
+                  <div>}</div>
+
+                  <div class="text-gray-400 pt-1">/* 2. El Elemento Hijo (La Insignia Flotante) */</div>
+                  <div><span class="text-yellow-400 font-bold">.badge-descuento</span> {</div>
+                  <div class="pl-6 text-green-400 font-bold">position: absolute;</div>
+                  <div class="pl-6 text-blue-400">top: 10px;</div>
+                  <div class="pl-6 text-blue-400">right: 10px; <span class="text-gray-500">/* Se pega a la esquina del PADRE */</span></div>
+                  <div>}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs text-idatMuted border-t border-gray-100 pt-2 flex justify-between flex-shrink-0">
+            <span>Regla mnemotécnica: "Padre relativo, hijo absoluto".</span>
+            <span>Comportamiento de Ancestros Contenedores</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 8: Ejemplo Interactivo de Absolute -->
+      <!-- ============================================== -->
+      <div id="slide-8" class="slide w-full bg-white rounded-3xl shadow-xl border border-gray-200 p-8 md:p-12 flex-col justify-between h-full">
+        <div class="flex flex-col h-full justify-between">
+          <div class="flex items-center justify-between mb-3 flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="bg-idatYellow text-idatDark font-bold px-2.5 py-0.5 rounded text-xs">DEMO EN VIVO 3</span>
+              <h2 class="text-xl font-black text-idatDark uppercase tracking-tight">Experimento: ¿Dónde aterriza `absolute`?</h2>
+            </div>
+            <button onclick="toggleExample('example-pos-abs')" class="text-xs bg-idatDark text-white px-4 py-1.5 rounded-full font-bold hover:bg-idatYellow hover:text-idatDark transition-colors">
+              💻 Ver Código / Vista Previa
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch flex-1 min-h-0 my-2">
+            <!-- Controles Interactivos -->
+            <div class="text-sm flex flex-col justify-between">
+              <div>
+                <p class="text-idatMuted leading-relaxed mb-3 text-xs md:text-sm">
+                  Queremos colocar una etiqueta <strong>"-40% OFF"</strong> en la esquina de la tarjeta. Observa qué pasa cuando el padre tiene o no tiene <code>position: relative</code>:
+                </p>
+                <div class="space-y-3 bg-idatLight p-4 rounded-2xl border border-gray-200 text-xs">
+                  <div>
+                    <label class="block font-bold text-idatDark mb-2">Comportamiento del Padre de la tarjeta:</label>
+                    <div class="flex flex-col gap-2">
+                      <button onclick="applyAbsoluteDemo(false)" class="p-2.5 text-left font-bold rounded-xl bg-red-100 hover:bg-red-200 text-red-900 border border-red-300 transition-colors">
+                        ❌ Sin position: relative en el Padre (Vuela sin control)
+                      </button>
+                      <button onclick="applyAbsoluteDemo(true)" class="p-2.5 text-left font-bold rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 transition-colors">
+                        ✅ Con position: relative en el Padre (Aterriza perfecto)
+                      </button>
+                    </div>
+                  </div>
+                  <div id="demo-abs-explanation" class="p-3 bg-white rounded-xl border border-gray-200 text-[11px] text-gray-700 leading-relaxed">
+                    👉 <strong>Estado:</strong> El padre tiene <code>position: relative</code>. La insignia se ubica a <code>top: 12px; right: 12px</code> exactamente dentro de la tarjeta.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de Resultados de la Demostración -->
+            <div id="card-playground-wrapper" class="relative border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col bg-white h-full min-h-[300px] md:h-auto">
+              <div class="bg-gray-100 px-4 py-2 flex justify-between items-center border-b border-gray-200">
+                <span id="label-pos-abs" class="text-xs font-bold text-idatDark">Vista Previa de la Tarjeta</span>
+                <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+              </div>
+              
+              <div class="p-6 flex-1 overflow-auto custom-scrollbar flex items-center justify-center bg-gray-50/50 relative">
+                <!-- VISTA PREVIA -->
+                <div id="preview-pos-abs" class="w-full flex justify-center">
+                  <!-- TARJETA PADRE -->
+                  <div id="demo-parent-card" class="demo-box-transition bg-white p-5 rounded-2xl border-2 border-gray-300 shadow-md w-64 relative">
+                    <!-- BADGE HIJO ABSOLUTO -->
+                    <div id="demo-child-badge" class="demo-box-transition absolute top-3 right-3 bg-red-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow">
+                      -40% OFF
+                    </div>
+
+                    <div class="w-10 h-10 bg-idatYellow text-idatDark rounded-xl flex items-center justify-center font-black text-lg mb-3">
+                      💻
+                    </div>
+                    <span id="parent-status-badge" class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded uppercase">Padre: relative</span>
+                    <h3 class="font-black text-sm text-idatDark mt-2">Curso Web 2026</h3>
+                    <p class="text-xs text-gray-500 mt-1">Domina HTML y CSS desde cero con proyectos reales.</p>
+                  </div>
+                </div>
+
+                <!-- CÓDIGO HTML/CSS -->
+                <div id="code-pos-abs" class="hidden w-full h-full font-mono text-xs text-yellow-400 bg-idatDark p-4 rounded-xl overflow-auto custom-scrollbar">
+                  <pre><span class="text-gray-400">&lt;!-- HTML --&gt;</span>
+&lt;<span class="text-blue-400">div</span> <span class="text-green-400">class</span>="<span class="text-white">tarjeta-curso</span>"&gt;
+  &lt;<span class="text-blue-400">span</span> <span class="text-green-400">class</span>="<span class="text-white">badge</span>"&gt;-40% OFF&lt;/<span class="text-blue-400">span</span>&gt;
+  &lt;<span class="text-blue-400">h3</span>&gt;Curso Web 2026&lt;/<span class="text-blue-400">h3</span>&gt;
+&lt;/<span class="text-blue-400">div</span>&gt;
+
+<span class="text-gray-400">/* CSS */</span>
+<span class="text-blue-400">.tarjeta-curso</span> {
+  <span class="text-green-400 font-bold">position: relative;</span> <span class="text-gray-400">/* &lt;-- El ancla */</span>
+  <span class="text-green-400">padding: 20px;</span>
+}
+
+<span class="text-blue-400">.badge</span> {
+  <span class="text-green-400 font-bold">position: absolute;</span>
+  <span class="text-green-400">top: 12px;</span>
+  <span class="text-green-400">right: 12px;</span>       <span class="text-gray-400">/* Esquina superior derecha */</span>
+}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 9: Fixed, Sticky y Taller z-index -->
+      <!-- ============================================== -->
+      <div id="slide-9" class="slide w-full bg-white rounded-3xl shadow-xl border border-gray-200 p-8 md:p-12 flex-col justify-between h-full">
+        <div class="flex flex-col h-full justify-between">
+          <div class="flex items-center justify-between mb-3 flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="bg-idatYellow text-idatDark font-bold px-2.5 py-0.5 rounded text-xs">TEMA 4 & TALLER</span>
+              <h2 class="text-xl font-black text-idatDark uppercase tracking-tight">Fixed, Sticky y Taller de Capas (z-index)</h2>
+            </div>
+            <button onclick="toggleExample('example-workshop-17')" class="text-xs bg-idatDark text-white px-4 py-1.5 rounded-full font-bold hover:bg-idatYellow hover:text-idatDark transition-colors">
+              💻 Ver Código / Vista Previa
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch flex-1 min-h-0 my-2">
+            <!-- Instrucciones y Comparativa -->
+            <div class="text-sm flex flex-col justify-between">
+              <div>
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                  <div class="p-2.5 bg-emerald-50 border-l-4 border-emerald-500 rounded-xl text-[11px]">
+                    <strong class="text-emerald-950 font-bold block">position: fixed</strong>
+                    Se pega al marco de la ventana (viewport). Siempre inmóvil ante el scroll (ej: botón WhatsApp).
+                  </div>
+                  <div class="p-2.5 bg-blue-50 border-l-4 border-blue-500 rounded-xl text-[11px]">
+                    <strong class="text-blue-950 font-bold block">position: sticky</strong>
+                    Fluye normal hasta que choca con <code>top: 0</code> y se congela en el techo al hacer scroll.
+                  </div>
+                </div>
+
+                <div class="space-y-1.5 text-xs">
+                  <div class="p-2 bg-gray-50 rounded-lg border-l-4 border-idatDark">
+                    <strong>Paso 1:</strong> Tarjeta con <code>position: relative</code> (el ancla base).
+                  </div>
+                  <div class="p-2 bg-gray-50 rounded-lg border-l-4 border-red-500">
+                    <strong>Paso 2:</strong> Badge con <code>position: absolute; top: 12px; left: 12px;</code>.
+                  </div>
+                  <div class="p-2 bg-gray-50 rounded-lg border-l-4 border-idatYellow">
+                    <strong>Paso 3:</strong> Botón favorito con <code>top: 12px; right: 12px;</code>.
+                  </div>
+                  <div class="p-2 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+                    <strong>Paso 4:</strong> Aplicar <code>z-index: 10</code> para que floten por encima de la imagen.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de Resultados del Taller -->
+            <div class="border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col bg-white h-full min-h-[300px] md:h-auto">
+              <div class="bg-gray-100 px-4 py-2 flex justify-between items-center border-b border-gray-200">
+                <span id="label-workshop-17" class="text-xs font-bold text-idatDark">Producto Terminado del Taller</span>
+                <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+              </div>
+              
+              <div class="p-6 flex-1 overflow-auto custom-scrollbar flex items-center justify-center bg-gray-50/50">
+                <!-- VISTA PREVIA -->
+                <div id="preview-workshop-17" class="w-full max-w-xs">
+                  <!-- TARJETA PRODUCTO -->
+                  <div class="bg-white rounded-2xl border border-gray-200 shadow-lg p-5 relative overflow-hidden group">
+                    <!-- Insignia Absoluta Izquierda -->
+                    <span class="absolute top-3 left-3 bg-idatYellow text-idatDark text-[10px] font-black uppercase px-2 py-0.5 rounded shadow z-10">
+                      NUEVO 2026
+                    </span>
+
+                    <!-- Botón Absoluto Derecha -->
+                    <button class="absolute top-3 right-3 w-8 h-8 bg-white/90 hover:bg-white text-red-500 rounded-full flex items-center justify-center shadow-md transition-transform hover:scale-110 z-10">
+                      ❤️
+                    </button>
+
+                    <!-- Imagen Ilustrativa -->
+                    <div class="h-32 bg-gradient-to-tr from-gray-900 to-gray-800 rounded-xl flex items-center justify-center text-4xl mb-4">
+                      🎧
+                    </div>
+
+                    <h3 class="font-extrabold text-sm text-idatDark">Auriculares Pro Wireless</h3>
+                    <p class="text-xs text-gray-500 mt-1">Cancelación activa de ruido y audio espacial 3D.</p>
+                    
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                      <span class="text-sm font-black text-idatDark">S/ 249.00</span>
+                      <button class="px-3 py-1.5 bg-idatDark text-idatYellow font-bold text-xs rounded-lg hover:bg-idatYellow hover:text-idatDark transition-colors">
+                        Comprar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CÓDIGO HTML/CSS -->
+                <div id="code-workshop-17" class="hidden w-full h-full font-mono text-xs text-yellow-400 bg-idatDark p-4 rounded-xl overflow-auto custom-scrollbar">
+                  <pre><span class="text-gray-400">/* Solución Taller Sesión 17 */</span>
+<span class="text-blue-400">.tarjeta-producto</span> {
+  <span class="text-green-400 font-bold">position: relative;</span> <span class="text-gray-400">/* Ancla obligatoria */</span>
+  <span class="text-green-400">padding: 20px;</span>
+  <span class="text-green-400">border-radius: 16px;</span>
+}
+
+<span class="text-blue-400">.badge-nuevo</span> {
+  <span class="text-green-400 font-bold">position: absolute;</span>
+  <span class="text-green-400">top: 12px;</span>
+  <span class="text-green-400">left: 12px;</span>
+  <span class="text-blue-400">z-index: 10;</span>        <span class="text-gray-400">/* Siempre por encima */</span>
+}
+
+<span class="text-blue-400">.btn-favorito</span> {
+  <span class="text-green-400 font-bold">position: absolute;</span>
+  <span class="text-green-400">top: 12px;</span>
+  <span class="text-green-400">right: 12px;</span>
+  <span class="text-blue-400">z-index: 10;</span>
+}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- DIAPOSITIVA 10: Cierre de Sesión / Agradecimiento -->
+      <!-- ============================================== -->
+      <div id="slide-10" class="slide w-full bg-idatDark rounded-3xl shadow-xl border border-gray-900 p-8 md:p-12 flex-col justify-between h-full text-white">
+        <div class="flex flex-col items-center justify-center text-center my-auto">
+          <div class="bg-idatYellow text-idatDark font-black px-6 py-2 rounded-full text-xs md:text-sm tracking-widest uppercase mb-4 animate-bounce">
+            ¡SESIÓN 17 CUMPLIDA!
+          </div>
+          <h2 class="text-3xl md:text-5xl font-black tracking-tight text-white leading-tight">
+            Muchas Gracias por <br class="hidden md:block">su Atención
+          </h2>
+          <p class="text-gray-400 mt-2 max-w-xl text-xs md:text-sm leading-relaxed">
+            Las dimensiones y el posicionamiento dejaron de ser un misterio: tus cajas tienen medidas exactas con <code>box-sizing: border-box</code> y sabes exactamente cuándo un elemento respeta la fila (<code>static</code> / <code>relative</code>), cuándo vuela con su ancla (<code>absolute</code>) y cuándo se congela en pantalla (<code>fixed</code> / <code>sticky</code>).
+          </p>
+          
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-3xl">
+            <div class="bg-gray-800/80 p-4 rounded-2xl border border-gray-700 text-left">
+              <span class="text-idatYellow text-xs font-bold uppercase block tracking-wider mb-1.5">REPASO DE HOY (SESIÓN 17)</span>
+              <ul class="text-xs text-gray-300 space-y-1">
+                <li>• <strong>box-sizing: border-box:</strong> Absorbe padding y border sin desbordar el ancho.</li>
+                <li>• <strong>Static + Relative:</strong> El flujo natural vs el desfase sin empujar vecinos.</li>
+                <li>• <strong>Padre Relative + Hijo Absolute:</strong> La fórmula infalible de anclaje.</li>
+                <li>• <strong>Fixed, Sticky & z-index:</strong> Control total en pantalla y orden de capas.</li>
+              </ul>
+            </div>
+            
+            <div class="bg-gray-800/80 p-4 rounded-2xl border border-gray-700 text-left">
+              <span class="text-idatYellow text-xs font-bold uppercase block tracking-wider mb-1.5">PRÓXIMA CLASE: SESIÓN 18</span>
+              <p class="text-xs text-gray-300 mb-2 font-medium">Entramos a la herramienta de diseño más potente de la web: <strong>Flexbox Masterclass</strong>:</p>
+              <ul class="text-xs text-gray-300 space-y-1">
+                <li>• <strong>display: flex:</strong> Adiós para siempre a los floats y cálculos extraños.</li>
+                <li>• <strong>justify-content & align-items:</strong> Centrar cajas vertical y horizontalmente en 2 líneas.</li>
+                <li>• <strong>flex-direction & gap:</strong> Filas, columnas y espaciados automáticos.</li>
+                <li>• <strong>flex-wrap:</strong> Distribución responsiva en múltiples líneas.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4 pt-3 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 w-full gap-2 flex-shrink-0">
+          <span>Ing. Jhon Chavez • <span class="text-idatYellow">Box-Sizing & Posicionamiento CSS</span></span>
+          <span>© 2026 IDAT. Todos los derechos reservados.</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer de Navegación e Indicadores (Altura Fija) -->
+  <footer class="bg-white border-t border-gray-200 px-6 md:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4 h-auto md:h-[72px] flex-shrink-0 z-50">
+    <!-- Paginación Izquierda -->
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-idatMuted font-bold tracking-wider uppercase">Progreso actual:</span>
+      <div class="flex items-center gap-1.5 bg-idatLight border border-gray-200 rounded-full px-3 py-1 text-xs font-black text-idatDark">
+        <span id="current-slide-num">1</span> / <span id="total-slides-num">10</span>
+      </div>
+    </div>
+
+    <!-- Controles Centrales de Navegación -->
+    <div class="flex items-center gap-2">
+      <button id="btn-prev" onclick="changeSlide(-1)" class="bg-idatDark hover:bg-idatYellow hover:text-idatDark text-white p-2.5 rounded-full transition-all duration-200 shadow disabled:opacity-30 disabled:pointer-events-none" title="Diapositiva Anterior">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      
+      <!-- Indicadores circulares individuales -->
+      <div class="flex items-center gap-1.5 px-2" id="dots-container"></div>
+
+      <button id="btn-next" onclick="changeSlide(1)" class="bg-idatDark hover:bg-idatYellow hover:text-idatDark text-white p-2.5 rounded-full transition-all duration-200 shadow disabled:opacity-30 disabled:pointer-events-none" title="Siguiente Diapositiva">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Indicador Técnico Derecha (Atajos) -->
+    <div class="hidden lg:flex items-center gap-2 text-xs text-idatMuted">
+      <span class="font-bold">Atajos del teclado:</span>
+      <kbd class="px-2 py-0.5 bg-gray-100 border border-gray-300 rounded text-idatDark font-mono font-bold shadow-sm">←</kbd>
+      <kbd class="px-2 py-0.5 bg-gray-100 border border-gray-300 rounded text-idatDark font-mono font-bold shadow-sm">→</kbd>
+    </div>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    function initDots() {
+      const container = document.getElementById('dots-container');
+      container.innerHTML = '';
+      for (let i = 1; i <= totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === 1 ? 'bg-idatYellow ring-2 ring-idatDark w-4' : 'bg-gray-300 hover:bg-gray-400'}`;
+        dot.title = `Ir a Diapositiva ${i}`;
+        dot.onclick = () => jumpToSlide(i);
+        container.appendChild(dot);
+      }
+    }
+
+    function jumpToSlide(num) {
+      if (num < 1 || num > totalSlides) return;
+      
+      document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+      document.getElementById(`slide-${currentSlide}`).classList.add('hidden');
+      
+      currentSlide = num;
+      document.getElementById(`slide-${currentSlide}`).classList.remove('hidden');
+      document.getElementById(`slide-${currentSlide}`).classList.add('active');
+      
+      updateUI();
+    }
+
+    function changeSlide(direction) {
+      const target = currentSlide + direction;
+      jumpToSlide(target);
+    }
+
+    function updateUI() {
+      document.getElementById('current-slide-num').innerText = currentSlide;
+      document.getElementById('total-slides-num').innerText = totalSlides;
+
+      document.getElementById('btn-prev').disabled = currentSlide === 1;
+      document.getElementById('btn-next').disabled = currentSlide === totalSlides;
+
+      const dots = document.getElementById('dots-container').children;
+      for (let i = 0; i < dots.length; i++) {
+        const index = i + 1;
+        if (index === currentSlide) {
+          dots[i].className = 'w-4 h-2.5 rounded-full transition-all duration-300 bg-idatYellow ring-2 ring-idatDark';
+        } else {
+          dots[i].className = 'w-2.5 h-2.5 rounded-full transition-all duration-300 bg-gray-300 hover:bg-gray-400';
+        }
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        changeSlide(1);
+      } else if (e.key === 'ArrowLeft') {
+        changeSlide(-1);
+      }
+    });
+
+    // Toggle Código vs Vista Previa
+    function toggleExample(id) {
+      let previewEl, codeEl, labelEl;
+      
+      if (id === 'example-box-sizing') {
+        previewEl = document.getElementById('preview-box-sizing');
+        codeEl = document.getElementById('code-box-sizing');
+        labelEl = document.getElementById('label-box-sizing');
+      } else if (id === 'example-pos-rel') {
+        previewEl = document.getElementById('preview-pos-rel');
+        codeEl = document.getElementById('code-pos-rel');
+        labelEl = document.getElementById('label-pos-rel');
+      } else if (id === 'example-pos-abs') {
+        previewEl = document.getElementById('preview-pos-abs');
+        codeEl = document.getElementById('code-pos-abs');
+        labelEl = document.getElementById('label-pos-abs');
+      } else if (id === 'example-workshop-17') {
+        previewEl = document.getElementById('preview-workshop-17');
+        codeEl = document.getElementById('code-workshop-17');
+        labelEl = document.getElementById('label-workshop-17');
+      }
+
+      if (previewEl.classList.contains('hidden')) {
+        previewEl.classList.remove('hidden');
+        codeEl.classList.add('hidden');
+        labelEl.innerText = "Vista Previa Interactiva";
+      } else {
+        previewEl.classList.add('hidden');
+        codeEl.classList.remove('hidden');
+        labelEl.innerText = "Código HTML / Reglas CSS";
+      }
+    }
+
+    // Demostración interactiva de Box-Sizing
+    function applyBoxSizingDemo(mode) {
+      const box = document.getElementById('interactive-box-sizing-box');
+      const tag = document.getElementById('box-sizing-tag');
+      const dim = document.getElementById('box-sizing-dimensions');
+      const exp = document.getElementById('demo-box-sizing-explanation');
+
+      if (mode === 'content-box') {
+        box.style.boxSizing = 'content-box';
+        tag.innerText = 'content-box';
+        tag.className = 'text-[10px] bg-red-600 text-white font-mono px-2 py-0.5 rounded font-bold';
+        dim.innerText = 'Ancho Real: 276px ⚠️ (220+48+8)';
+        dim.className = 'text-xs font-black text-red-900 mt-1';
+        exp.innerHTML = '❌ <strong>¡Peligro con content-box!:</strong> La caja engordó a <strong>276px</strong> y sobrepasó el límite punteado en rojo. ¡Esto es lo que desarma las columnas de tu web!';
+      } else if (mode === 'border-box') {
+        box.style.boxSizing = 'border-box';
+        tag.innerText = 'border-box';
+        tag.className = 'text-[10px] bg-idatDark text-idatYellow font-mono px-2 py-0.5 rounded font-bold';
+        dim.innerText = 'Ancho Real: EXACTAMENTE 220px ✔️';
+        dim.className = 'text-xs font-black text-amber-950 mt-1';
+        exp.innerHTML = '✅ <strong>¡Perfecto con border-box!:</strong> El relleno de 24px y el borde de 4px se absorbieron hacia adentro. La caja mide <strong>exactamente 220px</strong> y respeta la cuadrícula.';
+      }
+    }
+
+    // Demostración interactiva de Static vs Relative
+    function applyRelativeDemo(mode) {
+      const box2 = document.getElementById('interactive-box-2');
+      const tag2 = document.getElementById('box-2-tag');
+      const exp = document.getElementById('demo-rel-explanation');
+
+      if (mode === 'static') {
+        box2.style.position = 'static';
+        box2.style.top = 'auto';
+        box2.style.left = 'auto';
+        tag2.innerText = 'static';
+        tag2.className = 'text-[9px] bg-idatDark text-idatYellow px-1.5 py-0.5 rounded font-mono mt-1';
+        exp.innerHTML = '👉 <strong>Estado actual:</strong> <code>position: static</code>. Las cajas están en su flujo natural sin desplazarse.';
+      } else if (mode === 'relative-moved') {
+        box2.style.position = 'relative';
+        box2.style.top = '25px';
+        box2.style.left = '30px';
+        tag2.innerText = 'relative';
+        tag2.className = 'text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-mono mt-1';
+        exp.innerHTML = '🔥 <strong>¡Observa esto!:</strong> La Caja 2 se movió <code>top: 25px</code> y <code>left: 30px</code>, pero la <strong>Caja 3 se quedó exactamente donde estaba</strong>. Respeta el hueco original.';
+      }
+    }
+
+    // Demostración interactiva de Absolute y el Ancla
+    function applyAbsoluteDemo(hasRelativeParent) {
+      const parent = document.getElementById('demo-parent-card');
+      const badge = document.getElementById('demo-child-badge');
+      const status = document.getElementById('parent-status-badge');
+      const exp = document.getElementById('demo-abs-explanation');
+
+      if (hasRelativeParent) {
+        parent.style.position = 'relative';
+        badge.style.position = 'absolute';
+        badge.style.top = '12px';
+        badge.style.right = '12px';
+        status.innerText = 'Padre: relative (Anclado)';
+        status.className = 'text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded uppercase';
+        exp.innerHTML = '✅ <strong>¡Perfecto!:</strong> Como el padre tiene <code>position: relative</code>, el hijo absoluto sabe que sus coordenadas <code>top/right</code> son dentro de la tarjeta.';
+      } else {
+        parent.style.position = 'static';
+        badge.style.position = 'absolute';
+        badge.style.top = '12px';
+        badge.style.right = '12px';
+        status.innerText = 'Padre: static (Sin ancla)';
+        status.className = 'text-[9px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded uppercase';
+        exp.innerHTML = '❌ <strong>¡Peligro!:</strong> El padre es <code>static</code>. El hijo absoluto ignora la tarjeta y vuela hasta la esquina superior derecha del contenedor externo.';
+      }
+    }
+
+    window.onload = function() {
+      initDots();
+      updateUI();
+    };
+  </script>
+</body>
+</html>
